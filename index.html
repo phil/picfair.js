@@ -3,6 +3,7 @@
   <head>
     <title>Picfair.js</title>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script type="javavascript">
 
       // https://www.picfair.com/pics/91501382-positano-italy
@@ -21,9 +22,15 @@
       // http://res.cloudinary.com/fleetnation/image/private/c_fill,g_center,h_640,w_640/ v1418070939/bp7jigk4mvyy3lecjr2p.jpg
       // http://res.cloudinary.com/fleetnation/image/private/c_fit,w_1120/g_south,l_text:style_gothic2:© Phil Balchin,o_20,y_10/g_center,l_watermark4,o_25,y_50/ v1418070939/bp7jigk4mvyy3lecjr2p.jpg
 
-      function linkToPicfairURL(url){
-        return url;
-      }
+      //      function linkToPicfairURL(url){
+      //        $.get(url, function( data ) {
+      //          console.log(data.match(\title(.*)title\));
+      //            //$( ".result" ).html( data );
+      //            //alert( "Load was performed." );
+      //        });
+      //
+      //        //return,c url;
+      //      }
 
     </script>
   </head>
@@ -36,7 +43,27 @@
 
     <h2>Displaying and Linking to Picfair Pages</h2>
 
-    <script>linkToPicfairURL("https://www.picfair.com/pics/91501382-positano-italy")</script>
+    <script>
+      function linkToPicfairURL(url){
+        //console.log("getting picfair url")
+        jQuery.get(url, function( data ) {
+
+          var priceExpr = new RegExp("<span class=\"price\">&pound;([0-9.]+?)<\/span>", "i");
+          var price = data.match(priceExpr)[1];
+
+          var titleExpr = new RegExp("<div class='captiontitle'>[^]+?<h3>([^]+?)<\/h3>", "i");
+          var title = data.match(titleExpr)[1];
+
+          console.log("Title: " + sanitizeText(title) + " - " + sanitizeText(price));
+        });
+      }
+
+      function sanitizeText(text){
+        return text.replace(/\r\n|\r|\n/gi, "");
+      }
+
+      linkToPicfairURL("https://www.picfair.com/pics/91501382-positano-italy")
+    </script>
 
   </body>
 </html>
