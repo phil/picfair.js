@@ -44,9 +44,12 @@
     <h2>Displaying and Linking to Picfair Pages</h2>
 
     <script>
+
       function linkToPicfairURL(url){
         //console.log("getting picfair url")
         jQuery.get(url, function( data ) {
+
+          console.log(data);
 
           var priceExpr = new RegExp("<span class=\"price\">&pound;([0-9.]+?)<\/span>", "i");
           var price = data.match(priceExpr)[1];
@@ -54,9 +57,20 @@
           var titleExpr = new RegExp("<div class='captiontitle'>[^]+?<h3>([^]+?)<\/h3>", "i");
           var title = data.match(titleExpr)[1];
 
+          var imageMainExpr = new RegExp("<div class='thepicture[^]+?(<img[^]+?>)");
+          var imageMainTag = data.match(imageMainExpr);
+          console.log(imageMainURL);
+
+
           console.log("Title: " + sanitizeText(title) + " - " + sanitizeText(price));
+
+          //<!--document.createElement();-->
+          //alert(document.currentScript);
+
         });
       }
+
+
 
       function sanitizeText(text){
         return text.replace(/\r\n|\r|\n/gi, "");
