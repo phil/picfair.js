@@ -1,10 +1,11 @@
-
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>Picfair.js</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script type="javavascript">
+    <script>
 
       // https://www.picfair.com/pics/91501382-positano-italy
 
@@ -32,6 +33,70 @@
       //        //return,c url;
       //      }
 
+      $(document).ready(function(){
+        console.log("Document Ready");
+        $("[data-picfair]").picfair();
+      });
+
+function PicfairPhoto(url, callback) {
+  console.log("PicfairPhoto: " + url);
+
+  this.url = url;
+  this.photoID = "";
+  this.title = "";
+  this.price = "";
+
+  this.starred = false;
+
+  this.img = "";
+  this.mainPhotoURL = "";
+  this.thumbPhotoURL = "";
+
+  console.log("Title: " + this.title);
+  console.log("Price: " + this.price);
+
+  var titleExpr = new RegExp("<div class='captiontitle'>[^]+?<h3>([^]+?)<\/h3>", "i");
+  var priceExpr = new RegExp("<span class=\"price\">&pound;([0-9.]+?)<\/span>", "i");
+  var imageMainExpr = new RegExp("<div class='thepicture[^]+?(<img[^]+?>)");
+
+  jQuery.get(url, function( data ) {
+
+    this.price = data.match(priceExpr)[1];
+    this.title = data.match(titleExpr)[1];
+    this.img = data.match(imageMainExpr)[1];
+
+    callback(this);
+
+  });
+}
+
+$.fn.picfair = function(){
+  return this.each(function(){
+
+    var div = $(this);
+    //div.append('NEW TXT!!');
+
+    var titleElement = $('<div class="picfair-title"></div>');
+    div.append(titleElement);
+
+    var priceElement = $('<div class="picfair-price"></div>');
+    div.append(priceElement);
+
+    var picfairPhoto = new PicfairPhoto($(this).data("picfair"), function(photo){
+      console.log("FINAL callback");
+      div.append(photo.img);
+      titleElement.append(photo.title);
+      priceElement.append(photo.price);
+    });
+
+  });
+}
+
+function sanitizeText(text){
+  return text.replace(/\r\n|\r|\n/gi, "");
+}
+
+
     </script>
   </head>
 
@@ -43,41 +108,12 @@
 
     <h2>Displaying and Linking to Picfair Pages</h2>
 
-    <script>
+    <div data-picfair="https://www.picfair.com/pics/91501382-positano-italy">
+      A Bit More Text
+    </div>
 
-      function linkToPicfairURL(url){
-        //console.log("getting picfair url")
-        jQuery.get(url, function( data ) {
-
-          console.log(data);
-
-          var priceExpr = new RegExp("<span class=\"price\">&pound;([0-9.]+?)<\/span>", "i");
-          var price = data.match(priceExpr)[1];
-
-          var titleExpr = new RegExp("<div class='captiontitle'>[^]+?<h3>([^]+?)<\/h3>", "i");
-          var title = data.match(titleExpr)[1];
-
-          var imageMainExpr = new RegExp("<div class='thepicture[^]+?(<img[^]+?>)");
-          var imageMainTag = data.match(imageMainExpr);
-          console.log(imageMainURL);
-
-
-          console.log("Title: " + sanitizeText(title) + " - " + sanitizeText(price));
-
-          //<!--document.createElement();-->
-          //alert(document.currentScript);
-
-        });
-      }
-
-
-
-      function sanitizeText(text){
-        return text.replace(/\r\n|\r|\n/gi, "");
-      }
-
-      linkToPicfairURL("https://www.picfair.com/pics/91501382-positano-italy")
-    </script>
+    <div data-picfair="https://www.picfair.com/pics/91501915-golden-hour-sunshine"></div>
+    <div data-picfair="https://www.picfair.com/pics/balloon-takeoff"></div>
 
   </body>
 </html>
